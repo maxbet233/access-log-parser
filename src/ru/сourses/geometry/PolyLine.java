@@ -1,8 +1,6 @@
 package ru.сourses.geometry;
 
-import ru.сourses.Main;
-import ru.сourses.geometry.Line;
-import ru.сourses.geometry.Point;
+import ru.сourses.main.Main;
 
 import java.util.Arrays;
 

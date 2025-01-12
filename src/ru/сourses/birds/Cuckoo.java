@@ -2,7 +2,6 @@ package ru.сourses.birds;
 
 import ru.сourses.birds.Bird;
 
-import java.util.Random;
 
 public class Cuckoo extends Bird {
     @Override

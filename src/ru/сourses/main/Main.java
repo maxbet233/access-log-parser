@@ -1,4 +1,4 @@
-package ru.сourses;
+package ru.сourses.main;
 
 import ru.сourses.birds.Cuckoo;
 import ru.сourses.birds.Parrot;

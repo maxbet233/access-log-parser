@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Main-Class: ru.courses.Main
+Main-Class: ru.сourses.main.Main
 

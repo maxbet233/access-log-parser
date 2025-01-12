@@ -1,7 +1,7 @@
 package ru.сourses.geometry;
 
 
-import ru.сourses.Main;
+import ru.сourses.main.Main;
 
 public class Line implements Main.Measurable {
     Point point1, point2;
