@@ -1,6 +1,12 @@
+package ru.сourses.geometry;
+
+import ru.сourses.Main;
+import ru.сourses.geometry.Line;
+import ru.сourses.geometry.Point;
+
 import java.util.Arrays;
 
-public class PolyLine {
+public class PolyLine implements Main.Measurable {
     Point[] arrPoints;
 
     public PolyLine(Point[] arrPoint) {
