@@ -1,4 +1,8 @@
 import java.io.*;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
@@ -26,23 +30,45 @@ public class Main {
                 String line;
 
                 int countLine = 0;
-                int minLine = Integer.MAX_VALUE;
-                int maxLine = 0;
+                int countYandex = 0;
+                int countGoogle = 0;
 
                 while ((line = reader.readLine()) != null) {
                     int length = line.length();
                     if (length > 1024) throw new LineLongException("Длина строки превышает 1024 символа");
-                    if (length > maxLine) {
-                        maxLine = length;
-                    }
-                    if (length < minLine) {
-                        minLine = length;
+
+//                    if (line.contains("YandexBot")) countYandex++;
+//                    if (line.contains("Googlebot")) countGoogle++;
+
+                    if (line.contains("compatible; ")) {
+                        String[] bkt = line.split("compatible; ");
+                        String firstBrackets = bkt[1];
+                        String[] parts = firstBrackets.split(";");
+
+                        if (parts.length >= 2) {
+                            String fragment = parts[0];
+                            fragment = fragment.replaceAll("\\s", "");
+
+                            int indexSlash = fragment.indexOf("/");
+                            if (indexSlash != -1) {
+                                String bot = fragment.substring(0, indexSlash);
+
+                                if (bot.equals("YandexBot")) countYandex++;
+                                if (bot.equals("Googlebot")) countGoogle++;
+                            }
+                        }
                     }
                     countLine++;
                 }
-                System.out.println(countLine);
-                System.out.println(maxLine);
-                System.out.println(minLine);
+                double shareYandex = (double) countYandex / countLine * 100;
+                double shareGoogle = (double) countGoogle / countLine * 100;
+                DecimalFormat df = new DecimalFormat("#.##");
+
+                System.out.println("Количество строк: " + countLine);
+                System.out.println("Количество Яндекс-ботов: " + countYandex);
+                System.out.println("Количество Гугл-ботов: " + countGoogle);
+                System.out.println("Доля запросов Яндекс-бота: " + df.format(shareYandex) + "%");
+                System.out.println("Доля запросов Гугл-бота: " + df.format(shareGoogle) + "%");
 
             } catch (LineLongException | IOException ex) {
                 ex.printStackTrace();
