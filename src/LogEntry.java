@@ -44,8 +44,8 @@ public class LogEntry {
 
         referer = parts[10];
 
-        if (line.contains("(")){
-            userAgent = new UserAgent(line.split("\\(")[1]);
+        if (line.contains("Mozilla/5.0")){
+            userAgent = new UserAgent(line.split("Mozilla/5.0")[1]);
         }
 
     }

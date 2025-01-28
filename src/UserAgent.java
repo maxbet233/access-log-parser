@@ -10,6 +10,21 @@ public class UserAgent {
         String[] parts = userAgent.split(";");
         String typePart = parts[0].replaceAll(" ", "").replaceAll("\\(", "");
 
+        if (typePart.contains("Windows")) {
+            String[] winPart = typePart.split("N");
+            typePart = winPart[0];
+        }
+
+        if (typePart.contains("Linux")) {
+            if (typePart.contains("x86")) {
+                String[] linPart = typePart.split("x86");
+                typePart = linPart[0];
+            } else if (typePart.contains("Virtual"))  {
+                String[] linPart = typePart.split("Virtual");
+                typePart = linPart[0];
+            }
+        }
+
         if (typePart.contains("Windows") || typePart.contains("Linux") || typePart.contains("Macintosh")) {
             typeOS = typePart;
         } else typeOS = "not valid OS";
@@ -22,8 +37,7 @@ public class UserAgent {
             browser = "Opera";
         } else if (userAgent.contains("Edg")) {
             browser = "Edge";
-        }
-        else browser =  "Another browser";
+        } else browser = "Another browser";
     }
 
     public String getTypeOS() {
