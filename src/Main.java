@@ -48,7 +48,9 @@ public class Main {
                     Statistics  st = new Statistics();
 //                    System.out.println(st.getTrafficRate(logEntry));
 //                    System.out.println(st.getExistingPages(logEntry));
-                    System.out.println(st.getFrequencyOS(logEntry));
+//                    System.out.println(st.getFrequencyOS(logEntry));
+//                    System.out.println(st.getNotFoundPages(logEntry));
+                    System.out.println(st.getFrequencyBrowser(logEntry));
 
                     countLine++;
                 }
