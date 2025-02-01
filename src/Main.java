@@ -54,7 +54,7 @@ public class Main {
 //                    System.out.println(st.getNotFoundPages(logEntry));
 //                    System.out.println(st.getFrequencyBrowser(logEntry));
 //                    System.out.println(st.getAvgCountBadRequets(logEntry));
-//                    System.out.println(st.getAvgVisitUser(logEntry));
+                    System.out.println(st.getAvgVisitUser(logEntry));
 
 
                     countLine++;
