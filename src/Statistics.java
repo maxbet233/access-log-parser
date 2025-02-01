@@ -6,25 +6,43 @@ import java.util.*;
 
 public class Statistics {
     int totalTraffic;
+    int realTraffic;
+    int botTraffic;
+    private static int countBadRequest;
     LocalDateTime minTime;
     LocalDateTime maxTime;
-    static HashSet<String> exAddress = new HashSet<>();
-    static HashSet<String> notFoundAddress = new HashSet<>();
-    static HashMap<String, Integer> frequencyOS = new HashMap<>();
-    static HashMap<String, Integer> frequencyBrowser = new HashMap<>();
+    private static final HashMap<String, Integer> countUsers = new HashMap<>();
+    private static final HashSet<String> exAddress = new HashSet<>();
+    private static final HashSet<String> notFoundAddress = new HashSet<>();
+    private static final HashMap<String, Integer> frequencyOS = new HashMap<>();
+    private static final HashMap<String, Integer> frequencyBrowser = new HashMap<>();
 
     public Statistics() {
         this.totalTraffic = 0;
+        this.realTraffic = 0;
+        this.botTraffic = 0;
 
         DateTimeFormatter df = new DateTimeFormatterBuilder().appendPattern("dd/MMM/yyyy:HH:mm:ss").toFormatter(Locale.ENGLISH);
         this.minTime = LocalDateTime.parse("25/Sep/2022:06:00:00", df);
-        this.maxTime = LocalDateTime.parse("25/Sep/2022:07:00:00", df);
+        this.maxTime = LocalDateTime.parse("25/Sep/2022:17:00:00", df);
 
     }
 
     public void addEntry(LogEntry logEntry) {
 
         totalTraffic = logEntry.getSize();
+
+        if (logEntry.getResponseCode() >= 400 && logEntry.getResponseCode() <= 599) {
+            countBadRequest++;
+        }
+
+        if (logEntry.userAgent != null && !logEntry.userAgent.isBot()) {
+            realTraffic = logEntry.getSize();
+        }
+
+        if (logEntry.userAgent != null && logEntry.userAgent.isBot()) {
+            botTraffic = logEntry.getSize();
+        }
 
         if (logEntry.getTime().isBefore(minTime)) {
             this.minTime = logEntry.getTime();
@@ -54,12 +72,20 @@ public class Statistics {
 
     }
 
-    public int getTrafficRate(LogEntry logEntry) {
+    public int getRealTrafficRate(LogEntry logEntry) {
         addEntry(logEntry);
         Duration duration = Duration.between(minTime, maxTime);
-
         long diff = duration.getSeconds() / 3600;
-        return (int) (totalTraffic / diff);
+
+        return (int) (realTraffic / diff);
+    }
+
+    public int getBotTrafficRate(LogEntry logEntry) {
+        addEntry(logEntry);
+        Duration duration = Duration.between(minTime, maxTime);
+        long diff = duration.getSeconds() / 3600;
+
+        return (int) (botTraffic / diff);
     }
 
     public ArrayList<String> getExistingPages(LogEntry logEntry) {
@@ -145,5 +171,38 @@ public class Statistics {
 
         return resultMap;
     }
+
+    public double getAvgCountBadRequets(LogEntry logEntry) {
+        addEntry(logEntry);
+        Duration duration = Duration.between(minTime, maxTime);
+        long diff = duration.getSeconds() / 3600;
+
+        if (logEntry.getResponseCode() >= 400 && logEntry.getResponseCode() <= 599) {
+            return (double) diff / countBadRequest;
+        } else return 0;
+    }
+
+    public double getAvgVisitUser(LogEntry logEntry) {
+        addEntry(logEntry);
+
+        if (logEntry.userAgent != null && !logEntry.userAgent.isBot()) {
+
+            if (countUsers.containsKey(logEntry.getIpAddr())) {
+                countUsers.put(logEntry.getIpAddr(), countUsers.get(logEntry.getIpAddr()) + 1);
+            } else {
+                countUsers.put(logEntry.getIpAddr(), 1);
+            }
+
+        }
+
+        int allVisit = 0;
+        for (HashMap.Entry<String, Integer> entry : countUsers.entrySet()) {
+            Integer value = entry.getValue();
+            allVisit += value;
+        }
+
+        return (double) allVisit / countUsers.size();
+    }
+
 
 }

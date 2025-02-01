@@ -45,12 +45,17 @@ public class Main {
                         UserAgent ua = new UserAgent(userAgent);
                     }
 
+
                     Statistics  st = new Statistics();
-//                    System.out.println(st.getTrafficRate(logEntry));
+//                    System.out.println(st.getRealTrafficRate(logEntry));
+//                    System.out.println(st.getBotTrafficRate(logEntry));
 //                    System.out.println(st.getExistingPages(logEntry));
 //                    System.out.println(st.getFrequencyOS(logEntry));
 //                    System.out.println(st.getNotFoundPages(logEntry));
-                    System.out.println(st.getFrequencyBrowser(logEntry));
+//                    System.out.println(st.getFrequencyBrowser(logEntry));
+//                    System.out.println(st.getAvgCountBadRequets(logEntry));
+//                    System.out.println(st.getAvgVisitUser(logEntry));
+
 
                     countLine++;
                 }

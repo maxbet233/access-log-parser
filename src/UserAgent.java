@@ -19,7 +19,7 @@ public class UserAgent {
             if (typePart.contains("x86")) {
                 String[] linPart = typePart.split("x86");
                 typePart = linPart[0];
-            } else if (typePart.contains("Virtual"))  {
+            } else if (typePart.contains("Virtual")) {
                 String[] linPart = typePart.split("Virtual");
                 typePart = linPart[0];
             }
@@ -46,5 +46,13 @@ public class UserAgent {
 
     public String getBrowser() {
         return browser;
+    }
+
+    public boolean isBot() {
+        boolean bot;
+        if (userAgent.contains("bot")) {
+            bot = true;
+        } else bot = false;
+        return bot;
     }
 }
