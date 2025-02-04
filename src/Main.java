@@ -40,13 +40,14 @@ public class Main {
 
                     LogEntry logEntry = new LogEntry(line);
 
-                    if (line.contains("Mozilla/5.0")){
+                    if (line.contains("Mozilla/5.0")) {
                         userAgent = line.split("Mozilla/5.0")[1];
                         UserAgent ua = new UserAgent(userAgent);
+
                     }
 
 
-                    Statistics  st = new Statistics();
+                    Statistics st = new Statistics();
 //                    System.out.println(st.getRealTrafficRate(logEntry));
 //                    System.out.println(st.getBotTrafficRate(logEntry));
 //                    System.out.println(st.getExistingPages(logEntry));
@@ -54,7 +55,10 @@ public class Main {
 //                    System.out.println(st.getNotFoundPages(logEntry));
 //                    System.out.println(st.getFrequencyBrowser(logEntry));
 //                    System.out.println(st.getAvgCountBadRequets(logEntry));
-                    System.out.println(st.getAvgVisitUser(logEntry));
+//                    System.out.println(st.getAvgVisitUser(logEntry));
+//                    System.out.println(st.getPeakAttendance(logEntry));
+//                    System.out.println(st.getSiteList(logEntry));
+                    System.out.println(st.getMaxVisitUser(logEntry));
 
 
                     countLine++;

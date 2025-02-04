@@ -50,9 +50,7 @@ public class UserAgent {
 
     public boolean isBot() {
         boolean bot;
-        if (userAgent.contains("bot")) {
-            bot = true;
-        } else bot = false;
+        bot = userAgent.contains("bot");
         return bot;
     }
 }
