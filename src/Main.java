@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 public class Main {
     public static void main(String[] args) {
+        Statistics st = new Statistics();
         int count = 1;
         while (true) {
             System.out.println("Введите путь до файла:");
@@ -39,33 +40,33 @@ public class Main {
                     if (length > 1024) throw new LineLongException("Длина строки превышает 1024 символа");
 
                     LogEntry logEntry = new LogEntry(line);
+                    st.addEntry(logEntry);
 
                     if (line.contains("Mozilla/5.0")) {
                         userAgent = line.split("Mozilla/5.0")[1];
                         UserAgent ua = new UserAgent(userAgent);
 
                     }
-
-
-                    Statistics st = new Statistics();
-//                    System.out.println(st.getRealTrafficRate(logEntry));
-//                    System.out.println(st.getBotTrafficRate(logEntry));
-//                    System.out.println(st.getExistingPages(logEntry));
-//                    System.out.println(st.getFrequencyOS(logEntry));
-//                    System.out.println(st.getNotFoundPages(logEntry));
-//                    System.out.println(st.getFrequencyBrowser(logEntry));
-//                    System.out.println(st.getAvgCountBadRequets(logEntry));
-//                    System.out.println(st.getAvgVisitUser(logEntry));
-//                    System.out.println(st.getPeakAttendance(logEntry));
-//                    System.out.println(st.getSiteList(logEntry));
-                    System.out.println(st.getMaxVisitUser(logEntry));
-
-
                     countLine++;
                 }
-                double shareYandex = (double) countYandex / countLine * 100;
-                double shareGoogle = (double) countGoogle / countLine * 100;
-                DecimalFormat df = new DecimalFormat("#.##");
+//                double shareYandex = (double) countYandex / countLine * 100;
+//                double shareGoogle = (double) countGoogle / countLine * 100;
+//                DecimalFormat df = new DecimalFormat("#.##");
+//                System.out.println(countLine);
+
+
+                System.out.println(st.getTotalTraffic());
+                System.out.println(st.getRealTraffic());
+                System.out.println(st.getBotTraffic());
+                System.out.println(st.getFrequencyOS());
+                System.out.println(st.getFrequencyBrowser());
+//                System.out.println(st.getExAddress());
+//                System.out.println(st.getNotFoundAddress());
+                System.out.println(st.getCountBadRequest());
+                System.out.println(st.getCountAvgUsers());
+                System.out.println(st.getQuantityPerSecond());
+                System.out.println(st.getSiteList());
+                System.out.println(st.getMaxVisitUser());
 
             } catch (LineLongException | IOException ex) {
                 ex.printStackTrace();

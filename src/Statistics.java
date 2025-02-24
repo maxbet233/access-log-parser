@@ -1,4 +1,3 @@
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.*;
@@ -8,20 +7,21 @@ import java.util.*;
 import java.util.stream.Stream;
 
 public class Statistics {
-    int totalTraffic;
-    int realTraffic;
-    int botTraffic;
+    private long totalTraffic;
+    private long realTraffic;
+    private long botTraffic;
     static int isBotRequest;
-    private static int countBadRequest;
-    LocalDateTime minTime;
-    LocalDateTime maxTime;
+    private static double countAvgBadRequest;
+    private static LocalDateTime minTime;
+    private static LocalDateTime maxTime;
+    private static double countAvgUsers;
     private static final HashMap<String, Integer> countUsers = new HashMap<>();
     private static final HashSet<String> exAddress = new HashSet<>();
     private static final HashSet<String> notFoundAddress = new HashSet<>();
     private static final HashSet<String> siteList = new HashSet<>();
     private static final HashMap<String, Integer> frequencyOS = new HashMap<>();
     private static final HashMap<String, Integer> frequencyBrowser = new HashMap<>();
-    private static final HashMap<String, Integer> maxVisitUser = new HashMap<>();
+    HashMap<String, Integer> maxVisitUser = new HashMap<>();
     private static final HashMap<LocalDateTime, Integer> quantityPerSecond = new HashMap<>();
 
     public Statistics() {
@@ -30,8 +30,8 @@ public class Statistics {
         this.botTraffic = 0;
 
         DateTimeFormatter df = new DateTimeFormatterBuilder().appendPattern("dd/MMM/yyyy:HH:mm:ss").toFormatter(Locale.ENGLISH);
-        this.minTime = LocalDateTime.parse("25/Sep/2022:06:00:00", df);
-        this.maxTime = LocalDateTime.parse("25/Sep/2022:17:00:00", df);
+        minTime = LocalDateTime.parse("25/Sep/2022:00:00:00", df);
+        maxTime = LocalDateTime.parse("25/Sep/2022:01:00:00", df);
 
     }
 
@@ -39,21 +39,21 @@ public class Statistics {
     public void addEntry(LogEntry logEntry) {
 
         /*--------------------Общий объем запроса--------------------*/
-        totalTraffic = logEntry.getSize();
+        totalTraffic += logEntry.getSize();
 
         /*--------------------Счетчик запросов с ошибками--------------------*/
         if (logEntry.getResponseCode() >= 400 && logEntry.getResponseCode() <= 599) {
-            countBadRequest++;
+            countAvgBadRequest++;
         }
 
         /*--------------------Количество трафика реального пользователя--------------------*/
         if (logEntry.userAgent != null && !logEntry.userAgent.isBot()) {
-            realTraffic = logEntry.getSize();
+            realTraffic += logEntry.getSize();
         }
 
         /*--------------------Количество трафика бота--------------------*/
         if (logEntry.userAgent != null && logEntry.userAgent.isBot()) {
-            botTraffic = logEntry.getSize();
+            botTraffic += logEntry.getSize();
         }
 
         /*--------------------Пересчет временного окна--------------------*/
@@ -71,6 +71,26 @@ public class Statistics {
         /*--------------------Количество не существующих эндпоинтов--------------------*/
         if (logEntry.getResponseCode() == 404 && logEntry.getPath() != null) {
             notFoundAddress.add(logEntry.getPath());
+        }
+
+        /*--------------------Таблица посещаемости пользователями--------------------*/
+        if (logEntry.userAgent != null && !logEntry.userAgent.isBot()) {
+
+            if (countUsers.containsKey(logEntry.getIpAddr())) {
+                countUsers.put(logEntry.getIpAddr(), countUsers.get(logEntry.getIpAddr()) + 1);
+            } else {
+                countUsers.put(logEntry.getIpAddr(), 1);
+            }
+        }
+
+        /*--------------------Таблица максимальной посещаемости пользователя--------------------*/
+        if (logEntry.userAgent == null || !logEntry.userAgent.isBot()) {
+
+            if (maxVisitUser.containsKey(logEntry.getIpAddr())) {
+                maxVisitUser.put(logEntry.getIpAddr(), maxVisitUser.get(logEntry.getIpAddr()) + 1);
+            } else {
+                maxVisitUser.put(logEntry.getIpAddr(), 1);
+            }
         }
 
         /*--------------------Таблица частот ОС--------------------*/
@@ -106,52 +126,49 @@ public class Statistics {
                     .replaceAll("www.", "")
                     .replaceAll("&", "/"));
         }
+    }
 
-
+    /*--------------------Получение среднего объёма трафика пользователей за час--------------------*/
+    public long getTotalTraffic() {
+        Duration duration = Duration.between(minTime, maxTime);
+        long diff = duration.getSeconds() / 3600;
+        return totalTraffic / diff;
     }
 
     /*--------------------Получение среднего объёма трафика реальных пользователей за час--------------------*/
-    public int getRealTrafficRate(LogEntry logEntry) {
-        addEntry(logEntry);
+
+    public long getRealTraffic() {
         Duration duration = Duration.between(minTime, maxTime);
         long diff = duration.getSeconds() / 3600;
 
-        return (int) (realTraffic / diff);
+        return (realTraffic / diff);
     }
 
     /*-----------------------Получение среднего объёма трафика ботов за час ---------------------------------*/
-    public int getBotTrafficRate(LogEntry logEntry) {
-        addEntry(logEntry);
+
+    public long getBotTraffic() {
         Duration duration = Duration.between(minTime, maxTime);
         long diff = duration.getSeconds() / 3600;
 
-        return (int) (botTraffic / diff);
+        return (botTraffic / diff);
     }
 
     /*--------------------Получение существующих страниц сайта--------------------*/
-    public ArrayList<String> getExistingPages(LogEntry logEntry) {
-        addEntry(logEntry);
-
-        ArrayList<String> listPages = new ArrayList<>();
-        listPages.add(exAddress.toString());
-
-        return listPages;
+    public HashSet<String> getExAddress() {
+        HashSet<String> ep = new HashSet<>();
+        ep.add(exAddress.toString());
+        return ep;
     }
 
     /*--------------------Получение не существующих страниц сайта--------------------*/
-    public ArrayList<String> getNotFoundPages(LogEntry logEntry) {
-        addEntry(logEntry);
-
-        ArrayList<String> listPages = new ArrayList<>();
-        listPages.add(notFoundAddress.toString());
-
-        return listPages;
+    public HashSet<String> getNotFoundAddress() {
+        HashSet<String> nfp = new HashSet<>();
+        nfp.add(exAddress.toString());
+        return nfp;
     }
 
     /*--------------------Получение статистики по ОС--------------------*/
-    public HashMap<String, Double> getFrequencyOS(LogEntry logEntry) {
-        addEntry(logEntry);
-
+    public HashMap<String, Double> getFrequencyOS() {
         int sum = 0;
         for (HashMap.Entry<String, Integer> entry : frequencyOS.entrySet()) {
             Integer value = entry.getValue();
@@ -181,9 +198,7 @@ public class Statistics {
     }
 
     /*--------------------Получение статитики по браузерам--------------------*/
-    public HashMap<String, Double> getFrequencyBrowser(LogEntry logEntry) {
-        addEntry(logEntry);
-
+    public HashMap<String, Double> getFrequencyBrowser() {
         int sum = 0;
         for (HashMap.Entry<String, Integer> entry : frequencyBrowser.entrySet()) {
             Integer value = entry.getValue();
@@ -217,41 +232,25 @@ public class Statistics {
     }
 
     /*--------------------Получение среднего количества ошибочных запросов--------------------*/
-    public double getAvgCountBadRequets(LogEntry logEntry) {
-        addEntry(logEntry);
+    public double getCountBadRequest() {
         Duration duration = Duration.between(minTime, maxTime);
-        long diff = duration.getSeconds() / 3600;
-
-        if (logEntry.getResponseCode() >= 400 && logEntry.getResponseCode() <= 599) {
-            return (double) diff / countBadRequest;
-        } else return 0;
+        double diff = (double) duration.getSeconds() / 3600;
+        return countAvgBadRequest / diff;
     }
 
     /*--------------------Получение среднего количества посещений сайта--------------------*/
-    public double getAvgVisitUser(LogEntry logEntry) {
-        addEntry(logEntry);
-
-        if (logEntry.userAgent != null && !logEntry.userAgent.isBot()) {
-
-            if (countUsers.containsKey(logEntry.getIpAddr())) {
-                countUsers.put(logEntry.getIpAddr(), countUsers.get(logEntry.getIpAddr()) + 1);
-            } else {
-                countUsers.put(logEntry.getIpAddr(), 1);
-            }
-        }
-
+    public double getCountAvgUsers() {
         int allVisit = 0;
         for (HashMap.Entry<String, Integer> entry : countUsers.entrySet()) {
             Integer value = entry.getValue();
             allVisit += value;
         }
-
-        return (double) allVisit / countUsers.size();
+        countAvgUsers = countUsers.size();
+        return (double) allVisit / countAvgUsers;
     }
 
     /*--------------------Получение пиковой посещаемости сайта в секунду--------------------*/
-    public String getPeakAttendance(LogEntry logEntry) {
-        addEntry(logEntry);
+    public String getQuantityPerSecond() {
         Collection<Integer> count = quantityPerSecond.values();
         Stream<Integer> stream = count.stream();
         Integer maxValue = stream.max(Integer::compare).get();
@@ -267,8 +266,7 @@ public class Statistics {
     }
 
     /*--------------------Получение списка доменов сайтов--------------------*/
-    public HashSet<String> getSiteList(LogEntry logEntry) throws UnsupportedEncodingException {
-        addEntry(logEntry);
+    public HashSet<String> getSiteList() {
         HashSet<String> res = new HashSet<>();
         String[] partsSite;
 
@@ -286,24 +284,22 @@ public class Statistics {
     }
 
     /*--------------------Получение максимальной посещаемости одним пользователем--------------------*/
-    public int getMaxVisitUser(LogEntry logEntry) {
-        addEntry(logEntry);
-
-        if (logEntry.userAgent == null || !logEntry.userAgent.isBot()) {
-
-            if (maxVisitUser.containsKey(logEntry.getIpAddr())) {
-                maxVisitUser.put(logEntry.getIpAddr(), maxVisitUser.get(logEntry.getIpAddr()) + 1);
-            } else {
-                maxVisitUser.put(logEntry.getIpAddr(), 1);
-            }
-        }
-
+    public HashMap<String, Integer> getMaxVisitUser() {
+        HashMap<String, Integer> res = new HashMap<>();
         int maxValue = 0;
+        String user = "";
         for (int value : maxVisitUser.values()) {
             if (value > maxValue) {
                 maxValue = value;
             }
         }
-        return maxValue;
+        for (Map.Entry<String, Integer> entry : maxVisitUser.entrySet()) {
+            if (entry.getValue().equals(maxValue)) {
+                user = entry.getKey();
+                break;
+            }
+        }
+        res.put(user, maxValue);
+        return res;
     }
 }
