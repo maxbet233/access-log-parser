@@ -60,8 +60,8 @@ public class Main {
                 System.out.println(st.getBotTraffic());
                 System.out.println(st.getFrequencyOS());
                 System.out.println(st.getFrequencyBrowser());
-//                System.out.println(st.getExAddress());
-//                System.out.println(st.getNotFoundAddress());
+                System.out.println(st.getExAddress());
+                System.out.println(st.getNotFoundAddress());
                 System.out.println(st.getCountBadRequest());
                 System.out.println(st.getCountAvgUsers());
                 System.out.println(st.getQuantityPerSecond());

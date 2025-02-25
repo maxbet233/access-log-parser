@@ -21,7 +21,7 @@ public class Statistics {
     private static final HashSet<String> siteList = new HashSet<>();
     private static final HashMap<String, Integer> frequencyOS = new HashMap<>();
     private static final HashMap<String, Integer> frequencyBrowser = new HashMap<>();
-    HashMap<String, Integer> maxVisitUser = new HashMap<>();
+    private static final HashMap<String, Integer> maxVisitUser = new HashMap<>();
     private static final HashMap<LocalDateTime, Integer> quantityPerSecond = new HashMap<>();
 
     public Statistics() {
@@ -29,9 +29,9 @@ public class Statistics {
         this.realTraffic = 0;
         this.botTraffic = 0;
 
-        DateTimeFormatter df = new DateTimeFormatterBuilder().appendPattern("dd/MMM/yyyy:HH:mm:ss").toFormatter(Locale.ENGLISH);
-        minTime = LocalDateTime.parse("25/Sep/2022:00:00:00", df);
-        maxTime = LocalDateTime.parse("25/Sep/2022:01:00:00", df);
+//        DateTimeFormatter df = new DateTimeFormatterBuilder().appendPattern("dd/MMM/yyyy:HH:mm:ss").toFormatter(Locale.ENGLISH);
+        minTime = null;
+        maxTime = null;
 
     }
 
@@ -57,10 +57,15 @@ public class Statistics {
         }
 
         /*--------------------Пересчет временного окна--------------------*/
-        if (logEntry.getTime().isBefore(minTime)) {
-            this.minTime = logEntry.getTime();
-        } else if (logEntry.getTime().isAfter(maxTime)) {
-            this.maxTime = logEntry.getTime();
+        if ((minTime != null) && (maxTime != null)) {
+            if (logEntry.getTime().isBefore(minTime)) {
+                minTime = logEntry.getTime();
+            } else if (logEntry.getTime().isAfter(maxTime)) {
+                maxTime = logEntry.getTime();
+            }
+        } else {
+            minTime = logEntry.getTime();
+            maxTime = logEntry.getTime();
         }
 
         /*--------------------Коллекция существующих эндпоинтов--------------------*/
@@ -155,16 +160,13 @@ public class Statistics {
 
     /*--------------------Получение существующих страниц сайта--------------------*/
     public HashSet<String> getExAddress() {
-        HashSet<String> ep = new HashSet<>();
-        ep.add(exAddress.toString());
-        return ep;
+        return exAddress;
     }
+
 
     /*--------------------Получение не существующих страниц сайта--------------------*/
     public HashSet<String> getNotFoundAddress() {
-        HashSet<String> nfp = new HashSet<>();
-        nfp.add(exAddress.toString());
-        return nfp;
+        return notFoundAddress;
     }
 
     /*--------------------Получение статистики по ОС--------------------*/
