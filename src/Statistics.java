@@ -15,6 +15,7 @@ public class Statistics {
     private static LocalDateTime minTime;
     private static LocalDateTime maxTime;
     private static double countAvgUsers;
+    private static int countAllRealUsers;
     private static final HashMap<String, Integer> countUsers = new HashMap<>();
     private static final HashSet<String> exAddress = new HashSet<>();
     private static final HashSet<String> notFoundAddress = new HashSet<>();
@@ -78,7 +79,7 @@ public class Statistics {
             notFoundAddress.add(logEntry.getPath());
         }
 
-        /*--------------------Таблица посещаемости пользователями--------------------*/
+        /*--------------------Таблица посещаемости уникальными пользователями--------------------*/
         if (logEntry.userAgent != null && !logEntry.userAgent.isBot()) {
 
             if (countUsers.containsKey(logEntry.getIpAddr())) {
@@ -86,6 +87,11 @@ public class Statistics {
             } else {
                 countUsers.put(logEntry.getIpAddr(), 1);
             }
+        }
+
+        /*--------------------Количество посещений всеми реальными пользователями--------------------*/
+        if (logEntry.userAgent != null && !logEntry.userAgent.isBot()) {
+            countAllRealUsers++;
         }
 
         /*--------------------Таблица максимальной посещаемости пользователя--------------------*/
@@ -240,7 +246,7 @@ public class Statistics {
         return countAvgBadRequest / diff;
     }
 
-    /*--------------------Получение среднего количества посещений сайта--------------------*/
+    /*--------------------Получение среднего количества посещений сайта одним пользователем--------------------*/
     public double getCountAvgUsers() {
         int allVisit = 0;
         for (HashMap.Entry<String, Integer> entry : countUsers.entrySet()) {
@@ -249,6 +255,13 @@ public class Statistics {
         }
         countAvgUsers = countUsers.size();
         return (double) allVisit / countAvgUsers;
+    }
+
+    /*--------------------Получение среднего количества посещений сайта за час--------------------*/
+    public double getCountAvgUsersPerHour() {
+        Duration duration = Duration.between(minTime, maxTime);
+        double diff = (double) duration.getSeconds() / 3600;
+        return (double) countAllRealUsers/diff;
     }
 
     /*--------------------Получение пиковой посещаемости сайта в секунду--------------------*/

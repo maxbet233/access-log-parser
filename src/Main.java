@@ -67,6 +67,7 @@ public class Main {
                 System.out.println(st.getQuantityPerSecond());
                 System.out.println(st.getSiteList());
                 System.out.println(st.getMaxVisitUser());
+                System.out.println(st.getCountAvgUsersPerHour());
 
             } catch (LineLongException | IOException ex) {
                 ex.printStackTrace();
